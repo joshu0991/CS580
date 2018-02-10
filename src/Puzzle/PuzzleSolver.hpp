@@ -36,7 +36,7 @@ struct DerefComparator : public
 {
     bool operator()(const std::shared_ptr< Node > p_lhs, std::shared_ptr< Node > p_rhs)
     {
-        return p_lhs->m_total < p_rhs->m_total;
+        return p_lhs->m_total > p_rhs->m_total;
     }	
 };
 

@@ -173,7 +173,7 @@ bool PuzzleSolver::Solve(Puzzle *puzzle,
 
             // the cost from the previous to this is 1
             successor->m_goal = q->m_goal + 1;
-            successor->m_heuristic = h->Evaluate(puzzle, board);
+            successor->m_heuristic = h->Evaluate(puzzle, successor->m_board);
             successor->m_total = successor->m_goal + successor->m_heuristic;
 
             // check to ensure we want this successor in the open set
@@ -205,6 +205,5 @@ bool PuzzleSolver::Solve(Puzzle *puzzle,
     std::reverse(moves->begin(), moves->end());
 
     return true;
-    
 }
 
