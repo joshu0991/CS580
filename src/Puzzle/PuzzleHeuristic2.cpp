@@ -23,7 +23,7 @@ double PuzzleHeuristic2::Evaluate(Puzzle *puzzle, Puzzle::Board *board)
         // for every squarre on the board calculate the
         // manhatten distance to it's correct place
         // start by getting the current id at x,y
-        id = board->GetValue(i); // puzzle->IdFromRowCol(puzzleRow, puzzleColumn);
+        id = board->GetValue(i);
         
         // calculate the x and y components different
         // and take the absolute value add it to th
