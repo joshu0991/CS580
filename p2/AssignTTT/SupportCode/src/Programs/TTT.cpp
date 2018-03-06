@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 
+#include <iostream>
 double TTT::EvalState(const State s) const
 {
     Value winner = checkRowsForWin(s);
@@ -418,16 +419,16 @@ double TTT::maxValue(State p_state,
                                          p_bestMove));
         if (v >= p_beta)
         {
-            p_bestMove[0] = RowFromId(successor.first);
-            p_bestMove[1] = ColFromId(successor.first);
+            *p_bestMove = successor.first;
 
+            std::cout << "count Max1 " << v << std::endl;
             return v;
         }
 
         if (v > p_alpha)
         {
-            p_bestMove[0] = RowFromId(successor.first);
-            p_bestMove[1] = ColFromId(successor.first);
+            std::cout << "count Max2 " << v << std::endl;
+            *p_bestMove = successor.first;
             p_alpha = v;
         }
     }
@@ -461,16 +462,16 @@ double TTT::minValue(State p_state,
                                          p_bestMove));
         if (v <= p_alpha)
         {
-            p_bestMove[0] = RowFromId(successor.first);
-            p_bestMove[1] = ColFromId(successor.first);
+            std::cout << "count Min1 " << v << std::endl;
+            *p_bestMove = successor.first;
 
             return v;
         }
         
         if (v < p_beta)
         {
-            p_bestMove[0] = RowFromId(successor.first);
-            p_bestMove[1] = ColFromId(successor.first);
+            std::cout << "count Min2 " << v << std::endl;
+            *p_bestMove = successor.first;
             p_beta = v;
         }
     }
