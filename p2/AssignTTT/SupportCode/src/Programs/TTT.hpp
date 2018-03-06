@@ -153,6 +153,25 @@ public:
 	return dest;
     }
 
+    /*!
+     * Main recursive dispatching function for alpha beta minimax
+     *
+     * \param[in] p_state the state to evaluate
+     * \param[in] p_depth the current depth of the recursion tree
+     * \param[in] p_remMoves the remaining moves
+     * \param[in] p_lastMove the last move a player made
+     * \param[in] p_alpha the best move for max at a level in the tree
+     * \param[in] p_beta the best move for min at a level in the tree
+     * \param[in] p_player the current player to considers move
+     * \param[out] p_bestMove the best move for a player
+     *
+     * \note alpha and beta do not get passed up to the parent only
+     *       down to the next tree level v is then used for updating
+     *       alpha and beta at a given level
+     *
+     * \return the score of the best move
+     *
+     */
     double alphaBetaMiniMax(State p_state, 
                             int p_depth, 
                             int p_remMoves,
@@ -162,6 +181,26 @@ public:
                             Value p_player,
                             int* p_bestMove) const;
 
+    /*!
+     *
+     * Recusive function for the max players move choice
+     *
+     * \param[in] p_state the state to evaluate
+     * \param[in] p_depth the current depth of the recursion tree
+     * \param[in] p_remMoves the remaining moves
+     * \param[in] p_lastMove the last move a player made
+     * \param[in] p_alpha the best move for max at a level in the tree
+     * \param[in] p_beta the best move for min at a level in the tree
+     * \param[in] p_player the current player to considers move
+     * \param[out] p_bestMove the best move for a player
+     *
+     * \note alpha and beta do not get passed up to the parent only
+     *       down to the next tree level v is then used for updating
+     *       alpha and beta at a given level
+     *
+     * \return the score of the best move for max
+     *
+     */
     double maxValue(State p_state, 
                     int p_depth, 
                     int p_remMoves,
@@ -171,6 +210,26 @@ public:
                     Value p_player,
                     int* p_bestMove) const;
 
+    /*!
+     *
+     * Recursive call for the min players move choice
+     *
+     * \param[in] p_state the state to evaluate
+     * \param[in] p_depth the current depth of the recursion tree
+     * \param[in] p_remMoves the remaining moves
+     * \param[in] p_lastMove the last move a player made
+     * \param[in] p_alpha the best move for max at a level in the tree
+     * \param[in] p_beta the best move for min at a level in the tree
+     * \param[in] p_player the current player to considers move
+     * \param[out] p_bestMove the best move for a player
+     *
+     * \note alpha and beta do not get passed up to the parent only
+     *       down to the next tree level v is then used for updating
+     *       alpha and beta at a given level
+     *
+     * \return the score of the best move
+     *
+     */
     double minValue(State p_state, 
                     int p_depth, 
                     int p_remMoves,
@@ -180,18 +239,76 @@ public:
                     Value p_player,
                     int* p_bestMove) const;
 
+    /*!
+     *
+     * Determine if a state is a leaf node
+     *
+     * \param[in] p_state the state to check
+     * \param[in] p_lastMove the last move made
+     */
     bool terminalTest(State p_state, int p_lastMove) const;
 
+    /*!
+     *
+     * Generate all of the permutations of a board for a player
+     *
+     * \param[in] p_state the start state for the permutations
+     * \param[out] p_moves A vector containing pairs which represent
+     *             the move states possible and their "lastMove"
+     * \param[in] p_player the player to generate moves for
+     *
+     */
     void generateMoves(State p_state, 
                        std::vector< std::pair <std::int32_t, State > >& p_moves, 
                        Value p_player) const;
 
+    /*!
+     *
+     * Check if a given state is "full"
+     * \note this could be done simply by checking the
+     *       remaining moves variable
+     *
+     * \param[in] p_state the state to check
+     *
+     * \return true iff there are no remaining moves
+     *
+     */
     bool boardFull(const State p_state) const;
 
+    /*!
+     *
+     * Check the rows in a state for a victory
+     *
+     * \param[in] p_state the state to evaluate
+     *
+     * \return the value of the player if there is a victor
+     *         or an uninitialized state if no rows cause a win
+     *
+     */
     Value checkRowsForWin(State p_state) const;
 
+    /*!
+     *
+     * Check the columns in a state for a victory
+     *
+     * \param[in] p_state the state to evaluate
+     *
+     * \return the value of the player if there is a victor
+     *         or an uninitialized state if no columns cause a win
+     *
+     */
     Value checkColumnForWin(State p_state) const;
     
+    /*!
+     *
+     * Check the diagonals in a state for a victory
+     *
+     * \param[in] p_state the state to evaluate
+     *
+     * \return the value of the player if there is a victor
+     *         or an uninitialized state if no diagonals cause a win
+     *
+     */
     Value checkDiagonalsForWin(State p_state) const;
 };
 

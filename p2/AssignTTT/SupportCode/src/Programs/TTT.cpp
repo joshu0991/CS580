@@ -39,6 +39,8 @@ void TTT::BestMove(State   s,
 {
     double alpha = -1 * MAX_VALUE;
     double beta = MAX_VALUE;
+
+    // root
     *bestScore = alphaBetaMiniMax(s,
                                   depth, 
                                   remMoves, 
@@ -144,6 +146,7 @@ double TTT::alphaBetaMiniMax(State p_state,
     // terminal test / base case
     if (!p_depth || terminalTest(p_state, p_lastMove))
     {
+        /* debug
         std::cout << "---- eval state: " << 
             static_cast< int >(p_state[0]) <<
             static_cast< int >(p_state[1]) <<
@@ -156,6 +159,8 @@ double TTT::alphaBetaMiniMax(State p_state,
             static_cast< int >(p_state[8]) <<
             " at depth " << p_depth << 
             std::endl;
+        */
+
         // we have a winning board 
         // return it's value
         return EvalState(p_state);
@@ -163,6 +168,7 @@ double TTT::alphaBetaMiniMax(State p_state,
 
     if (p_player == FIRST)
     {
+        // return the max players best remaining move
         return maxValue(p_state,
                         p_depth,
                         p_remMoves,
@@ -175,6 +181,7 @@ double TTT::alphaBetaMiniMax(State p_state,
 
     if (p_player == SECOND)
     {
+        // return the min players best remaining move
         return minValue(p_state,
                         p_depth,
                         p_remMoves,
@@ -188,6 +195,7 @@ double TTT::alphaBetaMiniMax(State p_state,
 
 bool TTT::terminalTest(State p_state, int p_lastMove) const
 {
+    // less then zero on the first move
     if (p_lastMove < 0)
     {
         return false;
@@ -199,6 +207,7 @@ bool TTT::terminalTest(State p_state, int p_lastMove) const
 
 bool TTT::boardFull(const State p_state) const
 {
+    // check if no open spaces
     for (std::uint32_t iter = 0; iter < m_nrRows * m_nrCols; ++iter)
     {
         if (!p_state[iter])
@@ -255,6 +264,7 @@ TTT::Value TTT::checkRowsForWin(State p_state) const
             }
         }
 
+        // if the winner is init then we have a winning row
         if (winner != UNINIT)
         {
             return winner;
@@ -326,12 +336,13 @@ TTT::Value TTT::checkDiagonalsForWin(State p_state) const
     // from top right to bottom left 2, 4, 6, etc
 
     // check the main diagonal the next diagonal entry is at number
-    // of rows +1 
+    // of rows
     Value startOfRun = GetValueState(p_state, 0, 0);
     Value next = UNINIT;
     Value winner = UNINIT;
     std::int32_t numberInDiagCounter = 1;
 
+    // check the major diagonal if there is a players piece there
     if (startOfRun)
     {
         for (std::uint32_t iter = (m_nrCols + 1); 
@@ -366,6 +377,7 @@ TTT::Value TTT::checkDiagonalsForWin(State p_state) const
     winner = UNINIT;
     numberInDiagCounter = 1;
 
+    // check the minor diagonal if there is a players piece there
     if (startOfRun)
     {
         for (std::uint32_t iter = (2 * m_nrCols - 2); 
@@ -426,6 +438,7 @@ double TTT::maxValue(State p_state,
                                          p_beta,
                                          p_player == FIRST ? SECOND : FIRST,
                                          p_bestMove);
+        /*
         std::cout << "Max returned " << tempV << " for " <<
             static_cast< int >(p_state[0]) <<
             static_cast< int >(p_state[1]) <<
@@ -438,6 +451,7 @@ double TTT::maxValue(State p_state,
             static_cast< int >(p_state[8]) << " at depth "
             << p_depth <<
             std::endl;
+        */
         if (tempV > v)
         {
             v = tempV;
@@ -484,7 +498,8 @@ double TTT::minValue(State p_state,
                                          p_alpha,
                                          p_beta,
                                          p_player == FIRST ? SECOND : FIRST,
-                                         p_bestMove);
+        
+        /* debug                                 p_bestMove);
         std::cout << "Min returned " << tempV << " for " <<
             static_cast< int >(p_state[0]) <<
             static_cast< int >(p_state[1]) <<
@@ -497,6 +512,7 @@ double TTT::minValue(State p_state,
             static_cast< int >(p_state[8]) << " at depth "
             << p_depth <<
             std::endl;
+        */
         if (tempV < v)
         {
             v = tempV;
