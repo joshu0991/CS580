@@ -157,8 +157,8 @@ public:
                             int p_depth, 
                             int p_remMoves,
                             int p_lastMove,
-                            double& p_alpha,
-                            double& p_beta,
+                            double p_alpha,
+                            double p_beta,
                             Value p_player,
                             int* p_bestMove) const;
 
@@ -166,8 +166,8 @@ public:
                     int p_depth, 
                     int p_remMoves,
                     int p_lastMove,
-                    double& p_alpha,
-                    double& p_beta,
+                    double p_alpha,
+                    double p_beta,
                     Value p_player,
                     int* p_bestMove) const;
 
@@ -175,8 +175,8 @@ public:
                     int p_depth, 
                     int p_remMoves,
                     int p_lastMove,
-                    double& p_alpha,
-                    double& p_beta,
+                    double p_alpha,
+                    double p_beta,
                     Value p_player,
                     int* p_bestMove) const;
 

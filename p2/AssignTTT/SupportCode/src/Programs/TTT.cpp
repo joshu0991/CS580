@@ -136,14 +136,26 @@ double TTT::alphaBetaMiniMax(State p_state,
                              int p_depth, 
                              int p_remMoves,
                              int p_lastMove,
-                             double& p_alpha,
-                             double& p_beta,
+                             double p_alpha,
+                             double p_beta,
                              Value p_player,
                              int* p_bestMove) const
 {
     // terminal test / base case
     if (!p_depth || terminalTest(p_state, p_lastMove))
     {
+        std::cout << "---- eval state: " << 
+            static_cast< int >(p_state[0]) <<
+            static_cast< int >(p_state[1]) <<
+            static_cast< int >(p_state[2]) <<
+            static_cast< int >(p_state[3]) <<
+            static_cast< int >(p_state[4]) <<
+            static_cast< int >(p_state[5]) <<
+            static_cast< int >(p_state[6]) <<
+            static_cast< int >(p_state[7]) <<
+            static_cast< int >(p_state[8]) <<
+            " at depth " << p_depth << 
+            std::endl;
         // we have a winning board 
         // return it's value
         return EvalState(p_state);
@@ -208,15 +220,11 @@ TTT::Value TTT::checkRowsForWin(State p_state) const
         Value next = UNINIT;
         std::int32_t numberInRowCounter = 1;
         
-        if (!startOfRun)
-        {
-            break;
-        }
-        
         for (std::uint32_t column = 1; column < m_nrCols; ++column)
         {
             next = GetValueState(p_state, row, column);
-            if (next != startOfRun)
+            if (next != startOfRun || 
+                next == EMPTY || startOfRun == EMPTY)
             {
                 winner = UNINIT;
                 if (m_nrToWin != m_nrRows)
@@ -242,7 +250,7 @@ TTT::Value TTT::checkRowsForWin(State p_state) const
             ++numberInRowCounter;
             if (numberInRowCounter == m_nrToWin)
             {
-                winner = GetValueState(p_state, row - 1, column);
+                winner = GetValueState(p_state, row, column);
                 break;
             }
         }
@@ -266,18 +274,14 @@ TTT::Value TTT::checkColumnForWin(State p_state) const
         Value startOfRun = GetValueState(p_state, 0, column);
         std::int32_t numberInColCounter = 1;
 
-        if (!startOfRun)
-        {
-            break;
-        }
-
         for (std::uint32_t row = 1; row < m_nrRows; ++row)
         {
             next = GetValueState(p_state, row, column);
             if (next != startOfRun || 
                 !next)
             {
-                if (m_nrToWin != m_nrCols)
+                if (m_nrToWin != m_nrCols ||
+                    next == EMPTY || startOfRun == EMPTY)
                 {
                     // the row streak of the first
                     // ends at this column rest the counter
@@ -300,7 +304,7 @@ TTT::Value TTT::checkColumnForWin(State p_state) const
             ++numberInColCounter;
             if (numberInColCounter == m_nrToWin)
             {
-                winner = GetValueState(p_state, row - 1, column);
+                winner = GetValueState(p_state, row, column);
                 break;
             }
 
@@ -380,7 +384,7 @@ TTT::Value TTT::checkDiagonalsForWin(State p_state) const
             ++numberInDiagCounter;
             if (numberInDiagCounter == m_nrToWin)
             {
-                winner = static_cast< Value >(p_state[iter - (m_nrRows + 1)]);
+                winner = next;
                 break;
             }
         }
@@ -390,14 +394,15 @@ TTT::Value TTT::checkDiagonalsForWin(State p_state) const
             return winner;
         }
     }
+    return UNINIT;
 }
 
 double TTT::maxValue(State p_state, 
                      int p_depth, 
                      int p_remMoves,
                      int p_lastMove,
-                     double& p_alpha,
-                     double& p_beta,
+                     double p_alpha,
+                     double p_beta,
                      Value p_player,
                      int* p_bestMove) const
 {
@@ -406,32 +411,48 @@ double TTT::maxValue(State p_state,
     std::vector< std::pair< std::int32_t, State > > moves;
     generateMoves(p_state, moves, p_player);
     double v = -1 * MAX_VALUE;
+    double tempV = -1 * MAX_VALUE;
+    
+    // first is value of move second is move
+    std::pair< double, int> lastBest;
 
-    for (auto successor : moves)
+    for (auto& successor : moves)
     {
-        v = std::max(v, alphaBetaMiniMax(successor.second,
-                                         --p_depth,
-                                         --p_remMoves,
+        tempV = alphaBetaMiniMax(successor.second,
+                                         p_depth - 1,
+                                         p_remMoves - 1,
                                          successor.first,
                                          p_alpha,
                                          p_beta,
                                          p_player == FIRST ? SECOND : FIRST,
-                                         p_bestMove));
+                                         p_bestMove);
+        std::cout << "Max returned " << tempV << " for " <<
+            static_cast< int >(p_state[0]) <<
+            static_cast< int >(p_state[1]) <<
+            static_cast< int >(p_state[2]) <<
+            static_cast< int >(p_state[3]) <<
+            static_cast< int >(p_state[4]) <<
+            static_cast< int >(p_state[5]) <<
+            static_cast< int >(p_state[6]) <<
+            static_cast< int >(p_state[7]) <<
+            static_cast< int >(p_state[8]) << " at depth "
+            << p_depth <<
+            std::endl;
+        if (tempV > v)
+        {
+            v = tempV;
+            lastBest = std::make_pair(v, successor.first);
+        }
+
         if (v >= p_beta)
         {
-            *p_bestMove = successor.first;
-
-            std::cout << "count Max1 " << v << std::endl;
+            *p_bestMove = lastBest.second;
+      
             return v;
         }
-
-        if (v > p_alpha)
-        {
-            std::cout << "count Max2 " << v << std::endl;
-            *p_bestMove = successor.first;
-            p_alpha = v;
-        }
+        p_alpha = std::max(p_alpha, v);
     }
+    *p_bestMove = lastBest.second;
     return v;
 }
 
@@ -439,8 +460,8 @@ double TTT::minValue(State p_state,
                      int p_depth, 
                      int p_remMoves,
                      int p_lastMove,
-                     double& p_alpha,
-                     double& p_beta,
+                     double p_alpha,
+                     double p_beta,
                      Value p_player,
                      int* p_bestMove) const
 {
@@ -449,32 +470,49 @@ double TTT::minValue(State p_state,
     std::vector< std::pair< std::int32_t, State > > moves;
     generateMoves(p_state, moves, p_player);
     double v = MAX_VALUE;
+    double tempV = MAX_VALUE;
 
-    for (auto successor : moves)
+    // first is the move value second is the move
+    std::pair< double, int > lastBest;
+
+    for (auto& successor : moves)
     {
-        v = std::min(v, alphaBetaMiniMax(successor.second,
-                                         --p_depth,
-                                         --p_remMoves,
+        tempV = alphaBetaMiniMax(successor.second,
+                                         p_depth - 1,
+                                         p_remMoves - 1,
                                          successor.first,
                                          p_alpha,
                                          p_beta,
                                          p_player == FIRST ? SECOND : FIRST,
-                                         p_bestMove));
+                                         p_bestMove);
+        std::cout << "Min returned " << tempV << " for " <<
+            static_cast< int >(p_state[0]) <<
+            static_cast< int >(p_state[1]) <<
+            static_cast< int >(p_state[2]) <<
+            static_cast< int >(p_state[3]) <<
+            static_cast< int >(p_state[4]) <<
+            static_cast< int >(p_state[5]) <<
+            static_cast< int >(p_state[6]) <<
+            static_cast< int >(p_state[7]) <<
+            static_cast< int >(p_state[8]) << " at depth "
+            << p_depth <<
+            std::endl;
+        if (tempV < v)
+        {
+            v = tempV;
+            lastBest = std::make_pair(v, successor.first);
+        } 
+        
         if (v <= p_alpha)
         {
-            std::cout << "count Min1 " << v << std::endl;
-            *p_bestMove = successor.first;
+            *p_bestMove = lastBest.second;
 
             return v;
         }
-        
-        if (v < p_beta)
-        {
-            std::cout << "count Min2 " << v << std::endl;
-            *p_bestMove = successor.first;
-            p_beta = v;
-        }
+       
+        p_beta = std::min(p_beta, v);
     }
+    *p_bestMove = lastBest.second;
     return v;
 }
 
