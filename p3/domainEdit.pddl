@@ -1,0 +1,53 @@
+(define (domain carrying-objects)
+(:predicates
+    (is-room ?what)
+    (is-object ?what)
+    (connect ?room1 ?room2)
+    (at ?room)
+    (have ?who ?what)
+    (empty ?what))
+
+(:action MoveWithoutObject
+    :parameters (?from ?to)
+    :precondition (and (connect ?from ?to)
+                        (is-room ?from)
+                        (is-room ?to)
+                        (empty B)
+                        (at ?from))
+    :effect (and (not (at ?from))
+                 (at  ?to)))
+
+(:action MoveWithObject
+    :parameters (?from ?to)
+    :precondition (and (connect ?from ?to)
+                       (is-room ?from)
+                       (is-room ?to)
+                       (not (empty B))
+                       (empty ?to)
+                       (at ?from))
+    :effect (and (not (at ?from))
+                 (at ?to)))
+
+(:action pickup
+    :parameters (?what ?where)
+    :precondition (and (at ?where)
+                       (have ?where ?what)
+                       (is-object ?what)
+                       (is-room ?where)
+                       (empty B))
+    :effect (and (have B ?what)
+                 (not (have ?where ?what))
+                 (not (empty B))
+                 (empty ?where)))
+
+(:action release
+    :parameters (?what ?where)
+    :precondition (and (at ?where)
+                       (is-object ?what)
+                       (is-room ?where)
+                       (have B ?what)
+                       (empty ?where))
+    :effect (and (not (have B ?what))
+                 (have ?where ?what)
+                 (empty B)
+                 (not (empty ?where)))))
